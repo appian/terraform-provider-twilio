@@ -94,4 +94,11 @@ resource "twilio_phoneNumber" "test_phone_number" {
     search = "310*"
     country_code = "US"
 }
+
+resource "twilio_taskChannel" "custom" {
+  friendly_name = "Custom Channel"
+  workspace_sid = "WSXXXXXXXXXXXXXX"
+  unique_name = "custom"
+  channel_optimized_routing = true
+}
 ```
