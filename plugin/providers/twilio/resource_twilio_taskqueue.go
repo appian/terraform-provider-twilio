@@ -115,6 +115,39 @@ func resourceTwilioTaskQueueRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceTwilioTaskQueueUpdate(d *schema.ResourceData, meta interface{}) error {
+	log.Debug("ENTER resourceTwilioTaskQueueUpdate")
+
+	client := meta.(*TerraformTwilioContext).client
+	config := meta.(*TerraformTwilioContext).configuration
+	context := context.TODO()
+
+	sid := d.Id()
+	workspaceSid := d.Get("workspace_sid").(string)
+	createParams := flattentaskQueueForCreate(d)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid": config.AccountSID,
+		},
+	).Debug("START client.TaskRouter.Workspace.Queues.Update")
+
+	taskQueue, err := client.TaskRouter.Workspace(workspaceSid).Queues.Update(context, sid, createParams)
+	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"account_sid": config.AccountSID,
+			},
+		).WithError(err).Error("client.TaskRouter.Workspace.Queues.Update failed")
+
+		return err
+	}
+	d.SetId(taskQueue.Sid)
+	d.Set("friendly_name", taskQueue.FriendlyName)
+	d.Set("date_created", taskQueue.DateCreated)
+	d.Set("date_updated", taskQueue.DateUpdated)
+	d.Set("target_workers", taskQueue.TargetWorkers)
+	d.Set("task_order", taskQueue.TaskOrder)
+	d.Set("url", taskQueue.URL)
 	return nil
 }
 

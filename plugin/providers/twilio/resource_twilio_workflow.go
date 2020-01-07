@@ -115,6 +115,37 @@ func resourceTwilioWorkflowRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceTwilioWorkflowUpdate(d *schema.ResourceData, meta interface{}) error {
+	log.Debug("ENTER resourceTwilioWorkflowUpdate")
+
+	client := meta.(*TerraformTwilioContext).client
+	config := meta.(*TerraformTwilioContext).configuration
+	context := context.TODO()
+
+	sid := d.Id()
+	workspaceSid := d.Get("workspace_sid").(string)
+	createParams := flattenWorkflowForCreate(d)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid": config.AccountSID,
+		},
+	).Debug("START client.TaskRouter.Workspace.Workflows.Update")
+
+	workflow, err := client.TaskRouter.Workspace(workspaceSid).Workflows.Update(context, sid, createParams)
+	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"account_sid": config.AccountSID,
+			},
+		).WithError(err).Error("client.TaskRouter.Workspace.Workflows.Update failed")
+
+		return err
+	}
+	d.SetId(workflow.Sid)
+	d.Set("friendly_name", workflow.FriendlyName)
+	d.Set("date_created", workflow.DateCreated)
+	d.Set("date_updated", workflow.DateUpdated)
+	d.Set("task_reservation_timeout", workflow.TaskReservationTimeout)
 	return nil
 }
 

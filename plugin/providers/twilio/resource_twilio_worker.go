@@ -108,6 +108,32 @@ func resourceTwilioWorkerRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceTwilioWorkerUpdate(d *schema.ResourceData, meta interface{}) error {
+	log.Debug("ENTER resourceTwilioWorkerUpdate")
+
+	client := meta.(*TerraformTwilioContext).client
+	config := meta.(*TerraformTwilioContext).configuration
+	context := context.TODO()
+
+	sid := d.Id()
+	workspaceSid := d.Get("workspace_sid").(string)
+	updateParams := flattenWorkerForCreate(d)
+
+	worker, err := client.TaskRouter.Workspace(workspaceSid).Workers.Update(context, sid, updateParams)
+
+	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"account_sid": config.AccountSID,
+			},
+		).WithError(err).Error("client.TaskRouter.Workspace.Workers.Update failed")
+
+		return err
+	}
+	d.SetId(worker.Sid)
+	d.Set("friendly_name", worker.FriendlyName)
+	d.Set("date_created", worker.DateCreated)
+	d.Set("date_updated", worker.DateUpdated)
+	
 	return nil
 }
 
