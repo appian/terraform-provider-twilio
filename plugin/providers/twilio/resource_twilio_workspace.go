@@ -27,6 +27,18 @@ func resourceTwilioWorkspace() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"event_callback_url": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"events_filter": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"multi_task_enabled": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -35,7 +47,12 @@ func flattenWorkspaceForCreate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
 
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
-	// TODO: pass through multi task enabled
+	v.Add("EventCallbackUrl", d.Get("event_callback_url").(string))
+	v.Add("EventsFilter", d.Get("events_filter").(string))
+
+	if val := d.Get("multi_task_enabled"); val != "" {
+		v.Add("MultiTaskEnabled", val.(string))
+	}
 	// https://www.twilio.com/docs/taskrouter/api/workspace#create-a-workspace-resource
 	return v
 }
@@ -71,6 +88,8 @@ func resourceTwilioWorkspaceCreate(d *schema.ResourceData, meta interface{}) err
 	d.Set("date_updated", workspace.DateUpdated)
 	d.Set("multi_task_enabled", workspace.MultiTaskEnabled)
 	d.Set("sid", workspace.Sid)
+	d.Set("event_callback_url", workspace.EventCallbackUrl)
+	d.Set("events_filter", workspace.EventsFilter)
 	return nil
 }
 
@@ -104,6 +123,8 @@ func resourceTwilioWorkspaceRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("date_updated", workspace.DateUpdated)
 	d.Set("multi_task_enabled", workspace.MultiTaskEnabled)
 	d.Set("sid", workspace.Sid)
+	d.Set("event_callback_url", workspace.EventCallbackUrl)
+	d.Set("events_filter", workspace.EventsFilter)
 	return nil
 }
 
@@ -140,6 +161,8 @@ func resourceTwilioWorkspaceUpdate(d *schema.ResourceData, meta interface{}) err
 	d.Set("date_updated", workspace.DateUpdated)
 	d.Set("multi_task_enabled", workspace.MultiTaskEnabled)
 	d.Set("sid", workspace.Sid)
+	d.Set("event_callback_url", workspace.EventCallbackUrl)
+	d.Set("events_filter", workspace.EventsFilter)
 	return nil
 }
 
