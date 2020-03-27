@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	. "github.com/onsi/ginkgo"
 
-	"github.com/Preskton/terraform-provider-twilio/helpers/mapper"
+	"github.com/appian/terraform-provider-twilio/helpers/mapper"
 	. "github.com/onsi/gomega"
 )
 
