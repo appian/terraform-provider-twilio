@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	log "github.com/sirupsen/logrus"
@@ -27,6 +28,14 @@ func resourceTwilioWorkspace() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"event_callback_url": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"multi_task_enabled": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -35,8 +44,8 @@ func flattenWorkspaceForCreate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
 
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
-	// TODO: pass through multi task enabled
-	// https://www.twilio.com/docs/taskrouter/api/workspace#create-a-workspace-resource
+	v.Add("EventCallbackUrl", d.Get("event_callback_url").(string))
+	v.Add("MultiTaskEnabled", strconv.FormatBool(d.Get("multi_task_enabled").(bool)))
 	return v
 }
 
