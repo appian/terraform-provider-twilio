@@ -10,7 +10,11 @@ Current features:
   - Create
   - Update
   - Delete
-- `twilio_application`
+- `twilio_workspace`
+  - Create
+  - Update
+  - Delete
+- `twilio_phoneNumber`
   - Create
   - Update
   - Delete
@@ -22,11 +26,15 @@ Current features:
   - Create
   - Update
   - Delete
+- `twilio_taskChannel`
+  - Create
+  - Update
+  - Delete
 - `twilio_workflow`
   - Create
   - Update
   - Delete
-- `twilio_phoneNumber`
+- `twilio_application`
   - Create
   - Update
   - Delete
@@ -86,12 +94,36 @@ resource "twilio_taskQueue" "normal_support" {
 resource "twilio_workflow" "test_workflow" {
     friendly_name = "Test Workflow"
     workspace_sid = "WSXXXXXXXXXXXXXX"
-    configuration = "{\"task_routing\":{\"default_filter\":{\"queue\":\"${twilio_taskQueue.normal_support.id}\"}}}"
+    configuration = <<EOF
+{
+  "task_routing":{
+    "filters": [
+      {
+        "filter_friendly_name": "Prioritizing Filter",
+        "expression": "1==1",
+        "targets": [
+          {
+            "queue": "WQccc",
+            "priority": 1,
+            "timeout": 300
+          },
+          {
+            "priority": 10
+          }
+        ]
+      }
+    ], 
+    "default_filter": {
+      "queue": "WQccc"
+    }
+  }
+}
+EOF
 }
 
 resource "twilio_phoneNumber" "test_phone_number" {
     friendly_name = "Test Phone Number"
-    search = "310*"
+    search = "310"
     country_code = "US"
 }
 
@@ -100,5 +132,9 @@ resource "twilio_taskChannel" "custom" {
   workspace_sid = "WSXXXXXXXXXXXXXX"
   unique_name = "custom"
   channel_optimized_routing = true
+}
+
+resource "twilio_workspace" "workspace" {
+  friendly_name = "My Twilio workspace"
 }
 ```
