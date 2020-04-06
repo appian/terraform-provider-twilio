@@ -38,6 +38,13 @@ func flattenApplicationForCreate(d *schema.ResourceData) url.Values {
 	return v
 }
 
+func flattenApplicationForUpdate(d *schema.ResourceData) url.Values {
+	v := make(url.Values)
+
+	v.Add("FriendlyName", d.Get("friendly_name").(string))
+	return v
+}
+
 func resourceTwilioApplicationCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Debug("ENTER resourceTwilioApplicationCreate")
 
@@ -106,6 +113,37 @@ func resourceTwilioApplicationRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceTwilioApplicationUpdate(d *schema.ResourceData, meta interface{}) error {
+	log.Debug("ENTER resourceTwilioApplicationUpdate")
+
+	client := meta.(*TerraformTwilioContext).client
+	config := meta.(*TerraformTwilioContext).configuration
+	context := context.TODO()
+
+	sid := d.Id()
+	updateParams := flattenApplicationForUpdate(d)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid": config.AccountSID,
+		},
+	).Debug("START client.Applications.Update")
+
+	application, err := client.Applications.Update(context, sid, updateParams)
+	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"account_sid": config.AccountSID,
+			},
+		).WithError(err).Error("client.Applications.Create failed")
+
+		return err
+	}
+	d.SetId(application.Sid)
+	d.Set("friendly_name", application.FriendlyName)
+	d.Set("date_created", application.DateCreated)
+	d.Set("date_updated", application.DateUpdated)
+	d.Set("voice_url", application.VoiceURL)
+	d.Set("sms_url", application.SMSURL)
 	return nil
 }
 
