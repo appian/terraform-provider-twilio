@@ -42,6 +42,13 @@ func flattenWorkerForCreate(d *schema.ResourceData) url.Values {
 	return v
 }
 
+func flattenWorkerForUpdate(d *schema.ResourceData) url.Values {
+	v := make(url.Values)
+
+	v.Add("FriendlyName", d.Get("friendly_name").(string))
+	return v
+}
+
 func resourceTwilioWorkerCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Debug("ENTER resourceTwilioWorkerCreate")
 
@@ -116,7 +123,7 @@ func resourceTwilioWorkerUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	sid := d.Id()
 	workspaceSid := d.Get("workspace_sid").(string)
-	updateParams := flattenWorkerForCreate(d)
+	updateParams := flattenWorkerForUpdate(d)
 
 	worker, err := client.TaskRouter.Workspace(workspaceSid).Workers.Update(context, sid, updateParams)
 
@@ -133,7 +140,7 @@ func resourceTwilioWorkerUpdate(d *schema.ResourceData, meta interface{}) error 
 	d.Set("friendly_name", worker.FriendlyName)
 	d.Set("date_created", worker.DateCreated)
 	d.Set("date_updated", worker.DateUpdated)
-	
+
 	return nil
 }
 

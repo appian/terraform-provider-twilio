@@ -47,6 +47,14 @@ func flattenWorkflowForCreate(d *schema.ResourceData) url.Values {
 	return v
 }
 
+func flattenWorkflowForUpdate(d *schema.ResourceData) url.Values {
+	v := make(url.Values)
+
+	v.Add("FriendlyName", d.Get("friendly_name").(string))
+	v.Add("Configuration", d.Get("configuration").(string))
+	return v
+}
+
 func resourceTwilioWorkflowCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Debug("ENTER resourceTwilioWorkflowCreate")
 
@@ -123,7 +131,7 @@ func resourceTwilioWorkflowUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	sid := d.Id()
 	workspaceSid := d.Get("workspace_sid").(string)
-	createParams := flattenWorkflowForCreate(d)
+	createParams := flattenWorkflowForUpdate(d)
 
 	log.WithFields(
 		log.Fields{

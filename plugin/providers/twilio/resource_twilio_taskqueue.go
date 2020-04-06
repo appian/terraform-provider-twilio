@@ -42,6 +42,13 @@ func flattentaskQueueForCreate(d *schema.ResourceData) url.Values {
 	return v
 }
 
+func flattentaskQueueForUpdate(d *schema.ResourceData) url.Values {
+	v := make(url.Values)
+
+	v.Add("FriendlyName", d.Get("friendly_name").(string))
+	return v
+}
+
 func resourceTwilioTaskQueueCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Debug("ENTER resourceTwilioTaskQueueCreate")
 
@@ -123,7 +130,7 @@ func resourceTwilioTaskQueueUpdate(d *schema.ResourceData, meta interface{}) err
 
 	sid := d.Id()
 	workspaceSid := d.Get("workspace_sid").(string)
-	createParams := flattentaskQueueForCreate(d)
+	createParams := flattentaskQueueForUpdate(d)
 
 	log.WithFields(
 		log.Fields{
