@@ -33,14 +33,12 @@ func resourceTwilioApplication() *schema.Resource {
 
 func flattenApplicationForCreate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
 	return v
 }
 
 func flattenApplicationForUpdate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
 	return v
 }

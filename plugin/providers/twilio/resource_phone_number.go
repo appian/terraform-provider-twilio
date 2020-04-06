@@ -172,6 +172,7 @@ func resourceTwilioPhoneNumberUpdate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*TerraformTwilioContext).client
 	config := meta.(*TerraformTwilioContext).configuration
 	context := context.TODO()
+
 	sid := d.Id()
 	createParams := flattenPhoneNumberForUpdate(d)
 

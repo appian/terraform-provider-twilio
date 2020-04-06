@@ -41,7 +41,6 @@ func resourceTwilioWorkflow() *schema.Resource {
 
 func flattenWorkflowForCreate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
 	v.Add("Configuration", d.Get("configuration").(string))
 	return v
@@ -49,7 +48,6 @@ func flattenWorkflowForCreate(d *schema.ResourceData) url.Values {
 
 func flattenWorkflowForUpdate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
 	v.Add("Configuration", d.Get("configuration").(string))
 	return v
@@ -131,7 +129,7 @@ func resourceTwilioWorkflowUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	sid := d.Id()
 	workspaceSid := d.Get("workspace_sid").(string)
-	createParams := flattenWorkflowForUpdate(d)
+	updateParams := flattenWorkflowForUpdate(d)
 
 	log.WithFields(
 		log.Fields{
@@ -139,7 +137,7 @@ func resourceTwilioWorkflowUpdate(d *schema.ResourceData, meta interface{}) erro
 		},
 	).Debug("START client.TaskRouter.Workspace.Workflows.Update")
 
-	workflow, err := client.TaskRouter.Workspace(workspaceSid).Workflows.Update(context, sid, createParams)
+	workflow, err := client.TaskRouter.Workspace(workspaceSid).Workflows.Update(context, sid, updateParams)
 	if err != nil {
 		log.WithFields(
 			log.Fields{

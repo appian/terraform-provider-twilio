@@ -52,25 +52,19 @@ func resourceTwilioSubaccount() *schema.Resource {
 
 func flattenSubaccountForCreate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
-
 	return v
 }
 
 func flattenSubaccountForUpdate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
-
 	return v
 }
 
 func flattenSubaccountForDelete(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("Status", "closed")
-
 	return v
 }
 
@@ -166,7 +160,7 @@ func resourceTwilioSubaccountUpdate(d *schema.ResourceData, meta interface{}) er
 	context := context.TODO()
 
 	sid := d.Id()
-	createParams := flattenSubaccountForUpdate(d)
+	updateParams := flattenSubaccountForUpdate(d)
 
 	log.WithFields(
 		log.Fields{
@@ -174,7 +168,7 @@ func resourceTwilioSubaccountUpdate(d *schema.ResourceData, meta interface{}) er
 		},
 	).Debug("START client.Accounts.Update")
 
-	account, err := client.Accounts.Update(context, sid, createParams)
+	account, err := client.Accounts.Update(context, sid, updateParams)
 
 	if err != nil {
 		log.WithFields(
@@ -202,8 +196,7 @@ func resourceTwilioSubaccountDelete(d *schema.ResourceData, meta interface{}) er
 	context := context.TODO()
 
 	sid := d.Id()
-
-	updateData := flattenSubaccountForDelete(d)
+	updateParams := flattenSubaccountForDelete(d)
 
 	log.WithFields(
 		log.Fields{
@@ -212,7 +205,7 @@ func resourceTwilioSubaccountDelete(d *schema.ResourceData, meta interface{}) er
 		},
 	).Debug("START client.Accounts.Delete")
 
-	_, err := client.Accounts.Update(context, sid, updateData)
+	_, err := client.Accounts.Update(context, sid, updateParams)
 
 	log.WithFields(
 		log.Fields{
