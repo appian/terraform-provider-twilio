@@ -43,6 +43,8 @@ func resourceTwilioWorkspace() *schema.Resource {
 func flattenWorkspaceForCreate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
 
+func flattenWorkspaceForUpdate(d *schema.ResourceData) url.Values {
+	v := make(url.Values)
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
 	v.Add("EventCallbackUrl", d.Get("event_callback_url").(string))
 	v.Add("MultiTaskEnabled", strconv.FormatBool(d.Get("multi_task_enabled").(bool)))
