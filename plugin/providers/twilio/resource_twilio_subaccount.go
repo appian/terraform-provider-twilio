@@ -2,7 +2,6 @@ package twilio
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/url"
 
@@ -53,17 +52,19 @@ func resourceTwilioSubaccount() *schema.Resource {
 
 func flattenSubaccountForCreate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
+	return v
+}
 
+func flattenSubaccountForUpdate(d *schema.ResourceData) url.Values {
+	v := make(url.Values)
+	v.Add("FriendlyName", d.Get("friendly_name").(string))
 	return v
 }
 
 func flattenSubaccountForDelete(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("Status", "closed")
-
 	return v
 }
 
@@ -152,7 +153,39 @@ func resourceTwilioSubaccountRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceTwilioSubaccountUpdate(d *schema.ResourceData, meta interface{}) error {
-	return errors.New("Not implemented")
+	log.Debug("ENTER resourceTwilioSubaccountUpdate")
+
+	client := meta.(*TerraformTwilioContext).client
+	config := meta.(*TerraformTwilioContext).configuration
+	context := context.TODO()
+
+	sid := d.Id()
+	updateParams := flattenSubaccountForUpdate(d)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid": config.AccountSID,
+		},
+	).Debug("START client.Accounts.Update")
+
+	account, err := client.Accounts.Update(context, sid, updateParams)
+
+	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"account_sid": config.AccountSID,
+			},
+		).WithError(err).Error("client.Accounts.Update failed")
+
+		return err
+	}
+	d.Set("status", account.Status)
+	d.Set("auth_token", account.AuthToken)
+	d.Set("friendly_name", account.FriendlyName) // In the event that the name wasn't specified, Twilio generates one for you
+	d.Set("date_created", account.DateCreated)
+	d.Set("date_updated", account.DateUpdated)
+	d.Set("parent_account_sid", account.OwnerAccountSid)
+	return nil
 }
 
 func resourceTwilioSubaccountDelete(d *schema.ResourceData, meta interface{}) error {
@@ -163,8 +196,7 @@ func resourceTwilioSubaccountDelete(d *schema.ResourceData, meta interface{}) er
 	context := context.TODO()
 
 	sid := d.Id()
-
-	updateData := flattenSubaccountForDelete(d)
+	updateParams := flattenSubaccountForDelete(d)
 
 	log.WithFields(
 		log.Fields{
@@ -173,7 +205,7 @@ func resourceTwilioSubaccountDelete(d *schema.ResourceData, meta interface{}) er
 		},
 	).Debug("START client.Accounts.Delete")
 
-	_, err := client.Accounts.Update(context, sid, updateData)
+	_, err := client.Accounts.Update(context, sid, updateParams)
 
 	log.WithFields(
 		log.Fields{

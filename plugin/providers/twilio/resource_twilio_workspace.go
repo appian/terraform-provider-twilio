@@ -42,7 +42,12 @@ func resourceTwilioWorkspace() *schema.Resource {
 
 func flattenWorkspaceForCreate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
+	v.Add("FriendlyName", d.Get("friendly_name").(string))
+	return v
+}
 
+func flattenWorkspaceForUpdate(d *schema.ResourceData) url.Values {
+	v := make(url.Values)
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
 	v.Add("EventCallbackUrl", d.Get("event_callback_url").(string))
 	v.Add("MultiTaskEnabled", strconv.FormatBool(d.Get("multi_task_enabled").(bool)))
@@ -125,7 +130,7 @@ func resourceTwilioWorkspaceUpdate(d *schema.ResourceData, meta interface{}) err
 	context := context.TODO()
 
 	sid := d.Id()
-	createParams := flattenWorkspaceForCreate(d)
+	updateParams := flattenWorkspaceForUpdate(d)
 
 	log.WithFields(
 		log.Fields{
@@ -133,7 +138,7 @@ func resourceTwilioWorkspaceUpdate(d *schema.ResourceData, meta interface{}) err
 		},
 	).Debug("START client.WorkspaceCreator.Update")
 
-	workspace, err := client.WorkspaceCreator.Update(context, sid, createParams)
+	workspace, err := client.WorkspaceCreator.Update(context, sid, updateParams)
 
 	if err != nil {
 		log.WithFields(

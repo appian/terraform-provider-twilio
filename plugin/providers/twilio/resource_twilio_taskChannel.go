@@ -45,7 +45,6 @@ func resourceTwilioTaskChannel() *schema.Resource {
 
 func flattenTaskChannelForCreate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
 	v.Add("UniqueName", d.Get("unique_name").(string))
 	if val := d.Get("channel_optimized_routing").(bool); val {
@@ -56,7 +55,6 @@ func flattenTaskChannelForCreate(d *schema.ResourceData) url.Values {
 
 func flattenTaskChannelForUpdate(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
-
 	v.Add("Sid", d.Id())
 	v.Add("FriendlyName", d.Get("friendly_name").(string))
 	v.Add("WorkspaceSid", d.Get("workspace_sid").(string))

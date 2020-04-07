@@ -63,6 +63,12 @@ func flattenPhoneNumberForBuying(d *schema.ResourceData, phoneNumber string) url
 	return v
 }
 
+func flattenPhoneNumberForUpdate(d *schema.ResourceData) url.Values {
+	v := make(url.Values)
+	v.Add("FriendlyName", d.Get("friendly_name").(string))
+	return v
+}
+
 func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Debug("ENTER resourceTwilioPhoneNumberCreate")
 
@@ -161,6 +167,37 @@ func resourceTwilioPhoneNumberRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceTwilioPhoneNumberUpdate(d *schema.ResourceData, meta interface{}) error {
+	log.Debug("ENTER resourceTwilioPhoneNumberUpdate")
+
+	client := meta.(*TerraformTwilioContext).client
+	config := meta.(*TerraformTwilioContext).configuration
+	context := context.TODO()
+
+	sid := d.Id()
+	createParams := flattenPhoneNumberForUpdate(d)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid": config.AccountSID,
+		},
+	).Debug("START client.IncomingNumbers.Update")
+
+	updatedNumber, err := client.IncomingNumbers.Update(context, sid, createParams)
+	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"account_sid": config.AccountSID,
+			},
+		).WithError(err).Error("client.IncomingNumbers.Update failed")
+
+		return err
+	}
+	d.SetId(updatedNumber.Sid)
+	d.Set("friendly_name", updatedNumber.FriendlyName)
+	d.Set("phone_number", updatedNumber.PhoneNumber)
+	d.Set("date_created", updatedNumber.DateCreated)
+	d.Set("date_updated", updatedNumber.DateUpdated)
+	d.Set("capabilities", updatedNumber.Capabilities)
 	return nil
 }
 
